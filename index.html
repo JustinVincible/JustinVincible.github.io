@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Justin McMillen</title>
+<meta name="description" content="Justin McMillen, PhD candidate at the University of South Florida, works on world models: how an agent perceives, how it remembers objects it can no longer see, and when it should ask for help.">
+<meta property="og:title" content="Justin McMillen">
+<meta property="og:description" content="World models research: object memory, self-supervised perception, and agents that know when to ask.">
+<meta name="theme-color" content="#0E1822">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E1822'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23E3C565' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E1822;
+    --surface: #15222E;
+    --line: #24384A;
+    --text: #E6EDF2;
+    --muted: #93A6B5;
+    /* height bands, low to high. Each band also names a research area:
+       z3 memory, z2 perception, z4 metacognition, z1 3D perception, z0 earlier work */
+    --z0: #2E6F8E;
+    --z1: #3FA7A0;
+    --z2: #8CCB8A;
+    --z3: #E3C565;
+    --z4: #E98A4F;
+    /* chart marks, validated against --surface (OKLCH band, chroma floor, CVD separation) */
+    --mark-hl: #B48E23;
+    --mark-base: #1E7CA1;
+    --display: "Bricolage Grotesque", system-ui, sans-serif;
+    --body: "Figtree", system-ui, sans-serif;
+    --wrap: 1120px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 17px/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration-color: var(--z1); text-underline-offset: 3px; }
+  a:hover { color: var(--z2); }
+  :focus-visible { outline: 2px solid var(--z3); outline-offset: 3px; border-radius: 2px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  figure { margin: 0; }
+
+  /* nav */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; justify-content: space-between; align-items: center; height: 56px; }
+  nav .mark { font: 800 18px var(--display); text-decoration: none; letter-spacing: -0.02em; }
+  nav ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; font-size: 15px; }
+  nav ul a { text-decoration: none; color: var(--muted); }
+  nav ul a:hover { color: var(--text); }
+
+  /* buttons */
+  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn {
+    display: inline-block; padding: 10px 18px; border: 1px solid var(--line);
+    border-radius: 999px; text-decoration: none; font-weight: 500; font-size: 15px;
+    transition: border-color .15s, background .15s;
+  }
+  .btn:hover { border-color: var(--z1); color: var(--text); background: var(--surface); }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.primary:hover { background: var(--z2); border-color: var(--z2); color: var(--bg); }
+  .chip-btn {
+    font: 500 13px/1 var(--body); color: var(--text); background: transparent;
+    border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer;
+  }
+  .chip-btn:hover { border-color: var(--z1); background: var(--surface); }
+
+  /* hero */
+  .hero { border-bottom: 1px solid var(--line); }
+  .hero .wrap {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px;
+    align-items: center; min-height: min(92vh, 800px); padding-top: 40px; padding-bottom: 40px;
+  }
+  .hero h1 {
+    font: 800 clamp(48px, 7.4vw, 96px)/0.92 var(--display);
+    letter-spacing: -0.035em; margin: 0 0 28px;
+  }
+  .hero .statement {
+    font: 600 clamp(20px, 2.2vw, 26px)/1.35 var(--display);
+    letter-spacing: -0.01em; margin: 0 0 20px; max-width: 32ch;
+  }
+  .hero .bio { color: var(--muted); max-width: 50ch; margin: 0 0 32px; }
+
+  .demo canvas { width: 100%; height: 500px; display: block; }
+  .demo-bar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+    gap: 10px 16px; margin-top: 14px;
+  }
+  .key { display: flex; flex-wrap: wrap; gap: 6px 16px; list-style: none; margin: 0; padding: 0; font-size: 13px; color: var(--muted); }
+  .key li { display: flex; align-items: center; gap: 7px; }
+  .sw { width: 12px; height: 12px; flex: none; }
+  .sw.solid { background: var(--z3); border-radius: 2px; }
+  .sw.ring { border: 2px solid var(--z3); border-radius: 50%; background: color-mix(in srgb, var(--z3) 18%, transparent); }
+  .sw.dash { border: 1.5px dashed color-mix(in srgb, var(--z3) 70%, transparent); }
+  .ctl { display: flex; gap: 8px; }
+  .demo-caption { margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); max-width: 60ch; }
+
+  /* sections */
+  section { padding: 96px 0; border-bottom: 1px solid var(--line); }
+  h2 {
+    font: 800 clamp(32px, 4vw, 48px)/1 var(--display);
+    letter-spacing: -0.03em; margin: 0 0 12px;
+  }
+  .lede { color: var(--muted); max-width: 62ch; margin: 0 0 56px; }
+
+  /* research program */
+  .program { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+  .pillar { border-top: 3px solid var(--band); padding-top: 22px; }
+  .pillar h3 { font: 800 clamp(26px, 2.6vw, 32px)/1.05 var(--display); letter-spacing: -0.025em; margin: 0 0 6px; }
+  .pillar .q { font: 600 20px/1.3 var(--display); color: var(--band); margin: 0 0 16px; }
+  .pillar p { margin: 0 0 14px; }
+  .pillar a { font-weight: 600; text-decoration-color: var(--band); }
+
+  /* projects: wide rows, not cards */
+  .project {
+    display: grid; grid-template-columns: 170px minmax(0, 1fr) 340px; gap: 40px;
+    padding: 44px 0; border-top: 1px solid var(--line); position: relative;
+  }
+  .project::before {
+    content: ""; position: absolute; left: 0; top: -1px; height: 3px; width: 72px;
+    background: var(--band, var(--z1));
+  }
+  .rows > .project:last-child { border-bottom: 1px solid var(--line); }
+  #more .rows > .project:last-child { border-bottom: 0; }
+  .meta { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .meta strong { display: block; color: var(--text); font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .status {
+    display: table; margin-top: 10px; padding: 2px 10px; border-radius: 999px;
+    border: 1px solid var(--line); font-size: 13px; color: var(--text);
+  }
+  .project h3 { font: 600 clamp(24px, 2.6vw, 30px)/1.15 var(--display); letter-spacing: -0.02em; margin: 0 0 6px; }
+  .project .sub { color: var(--muted); margin: 0 0 16px; font-size: 16px; }
+  .project p { margin: 0 0 16px; max-width: 60ch; }
+  .results { margin: 24px 0 18px; display: grid; gap: 16px; }
+  .result { padding: 2px 0 2px 16px; border-left: 3px solid var(--band, var(--z1)); }
+  .result b { display: block; font: 800 34px/1.05 var(--display); letter-spacing: -0.02em; margin-bottom: 6px; }
+  .result span { display: block; color: var(--muted); font-size: 15px; line-height: 1.45; max-width: 52ch; }
+  .project .plinks { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; font-weight: 500; margin: 0; }
+  .plinks .note { color: var(--muted); font-weight: 400; }
+
+  .figure {
+    position: relative; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--line); background: var(--surface);
+  }
+  .figure canvas, .figure svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .fig figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+  .fig figcaption p { margin: 10px 0 0; }
+
+  /* segmented toggle */
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: 500 13px/1 var(--body); color: var(--muted); background: transparent; border: 0;
+    border-radius: 999px; padding: 7px 12px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  .seg button:not([aria-pressed="true"]):hover { color: var(--text); }
+
+  /* chart */
+  .chart { padding: 20px 20px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); align-self: start; }
+  .chart-title { font: 600 15px/1.35 var(--body); color: var(--text); margin: 0 0 18px; }
+  .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .bar-row { position: relative; border-radius: 4px; outline-offset: 4px; cursor: default; }
+  .bar-label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+  .track { display: flex; align-items: center; gap: 8px; }
+  .fill {
+    height: 14px; min-width: 3px; width: calc((100% - 56px) * var(--v) / 100);
+    background: var(--mark-base); border-radius: 0 4px 4px 0;
+  }
+  .fill.hl { background: var(--mark-hl); }
+  .val { font-size: 14px; font-weight: 600; color: var(--text); }
+  .tip {
+    display: none; position: absolute; left: 0; top: calc(100% + 6px); z-index: 2;
+    width: max-content; max-width: 280px; padding: 8px 10px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--line); font-size: 13px; line-height: 1.45; color: var(--text);
+  }
+  .bar-row:hover .tip, .bar-row:focus-visible .tip { display: block; }
+  .chart-note { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 22px 0 0; }
+
+  /* diagram */
+  .dg-box { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+  .dg-h { font: 600 13.5px var(--body); fill: var(--text); }
+  .dg-t { font: 400 12.5px var(--body); fill: var(--muted); }
+  .dg-o { font: 600 12.5px var(--body); fill: var(--z4); }
+  .dg-line { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+  .dg-ask { stroke: var(--z4); stroke-width: 1.5; fill: none; }
+
+  /* earlier work */
+  .earlier { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-top: 56px; }
+  .earlier article { border-top: 1px solid var(--line); padding-top: 20px; position: relative; }
+  .earlier article::before {
+    content: ""; position: absolute; left: 0; top: -1px; height: 3px; width: 48px; background: var(--z0);
+  }
+  .earlier h3 { font: 600 21px/1.25 var(--display); letter-spacing: -0.015em; margin: 0 0 4px; }
+  .earlier .venue { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+  .earlier p { margin: 0 0 12px; }
+  .earlier .plinks { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; font-weight: 500; }
+
+  /* experience timeline (genuinely a sequence) */
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li {
+    display: grid; grid-template-columns: 170px 1fr; gap: 40px;
+    padding: 26px 0; border-top: 1px solid var(--line);
+  }
+  .timeline li:last-child { border-bottom: 1px solid var(--line); }
+  .when { color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+  .timeline h3 { font: 600 20px/1.3 var(--display); margin: 0 0 2px; }
+  .timeline .org { color: var(--muted); margin: 0 0 8px; }
+  .timeline p { margin: 0; max-width: 64ch; }
+  .honors { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+  .honors span { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 15px; }
+
+  /* publications */
+  .pubs { list-style: none; margin: 0; padding: 0; }
+  .pubs li {
+    display: grid; grid-template-columns: 170px 1fr; gap: 40px;
+    padding: 22px 0; border-top: 1px solid var(--line);
+  }
+  .pubs li:last-child { border-bottom: 1px solid var(--line); }
+  .pubs .venue { color: var(--muted); font-size: 15px; line-height: 1.45; }
+  .pubs .title { font-weight: 600; display: block; margin-bottom: 4px; }
+  .pubs .authors { display: block; color: var(--muted); font-size: 15px; }
+  .pubs .authors b { color: var(--text); font-weight: 600; }
+  .pubs .plinks { display: flex; gap: 18px; margin-top: 8px; font-size: 14px; font-weight: 500; }
+
+  footer { padding: 72px 0 96px; }
+  footer h2 { margin-bottom: 20px; }
+  footer p { color: var(--muted); max-width: 56ch; margin: 0 0 28px; }
+
+  @media (max-width: 960px) {
+    .hero .wrap { grid-template-columns: 1fr; min-height: 0; padding-top: 32px; gap: 32px; }
+    .demo canvas { height: 420px; }
+    .program { grid-template-columns: 1fr; gap: 36px; }
+    .project { grid-template-columns: 1fr; gap: 18px; }
+    .project > figure { max-width: 520px; }
+    .earlier { grid-template-columns: 1fr; gap: 32px; }
+    .timeline li, .pubs li { grid-template-columns: 1fr; gap: 6px; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px; }
+    nav ul { gap: 14px; font-size: 14px; }
+    nav ul li.hide-sm { display: none; }
+    section { padding: 64px 0; }
+    .demo canvas { height: 340px; }
+    .result b { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="wrap">
+    <a class="mark" href="#top">JM</a>
+    <ul>
+      <li><a href="#research">Research</a></li>
+      <li class="hide-sm"><a href="#experience">Experience</a></li>
+      <li><a href="#publications">Papers</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>Justin<br>McMillen</h1>
+      <p class="statement">I study what an agent needs to act on its own in a world it can only partly see: how it perceives, what it remembers, and when it knows to ask.</p>
+      <p class="bio">PhD candidate in Electrical Engineering at the University of South Florida, advised by Yasin Yilmaz in SISLab, and a PhD research intern at SAS. I work on world models, self-supervised learning and 3D perception, and I test ideas with controlled, pre-registered experiments. I graduate in May 2027 and I'm looking for research scientist roles in world models and embodied AI.</p>
+      <div class="links">
+        <a class="btn primary" href="mailto:jomcmillen@gmail.com">Email me</a>
+        <a class="btn" href="cv.pdf">CV</a>
+        <a class="btn" href="https://github.com/" data-github>GitHub</a>
+        <a class="btn" href="https://scholar.google.com/citations?user=tedFHyYAAAAJ&amp;hl=en">Google Scholar</a>
+        <a class="btn" href="https://www.linkedin.com/in/justin-mcmillen/">LinkedIn</a>
+      </div>
+    </div>
+    <figure class="demo">
+      <canvas id="memory" role="img" aria-label="Top-down view of a room where five coloured blocks slide and bounce off the walls. An agent sweeps a 60 degree view around the room. Blocks outside the view are tracked by memory nodes whose uncertainty ellipses grow until each block is seen again."></canvas>
+      <figcaption>
+        <div class="demo-bar">
+          <ul class="key">
+            <li><span class="sw solid"></span>In view</li>
+            <li><span class="sw ring"></span>Remembered, with uncertainty</li>
+            <li><span class="sw dash"></span>True position</li>
+          </ul>
+          <div class="ctl">
+            <button type="button" class="chip-btn" id="demo-truth">Hide true positions</button>
+            <button type="button" class="chip-btn" id="demo-pause">Pause</button>
+          </div>
+        </div>
+        <p class="demo-caption">A toy node memory, running in your browser. When a block leaves the agent's 60° view, its node keeps moving at the block's estimated velocity, and the ellipse grows until the next sighting.</p>
+      </figcaption>
+    </figure>
+  </div>
+</header>
+
+<main>
+  <section id="research">
+    <div class="wrap">
+      <h2>One agent, three parts</h2>
+      <p class="lede">To act over long horizons, an agent has to turn pixels into things, keep track of things it can no longer see, and know when its own knowledge runs out. I study each part on its own, with the other parts replaced by oracles, so that what works and what fails can be traced to that part.</p>
+      <div class="program">
+        <div class="pillar" style="--band: var(--z3)">
+          <h3>Memory</h3>
+          <p class="q">Where did it go?</p>
+          <p>Given oracle detections, explicit object nodes keep 94% of hidden blocks that move outside FloWM's built-in velocities. FloWM's dense grid memory keeps 4%.</p>
+          <a href="#compass">More on COMPASS</a>
+        </div>
+        <div class="pillar" style="--band: var(--z2)">
+          <h3>Perception</h3>
+          <p class="q">What am I looking at?</p>
+          <p>Superpixel and grid tokens train JEPA encoders that tie on segmentation, and grid features read out on superpixels do just as well.</p>
+          <a href="#sp-jepa">More on SP-JEPA</a>
+        </div>
+        <div class="pillar" style="--band: var(--z4)">
+          <h3>Metacognition</h3>
+          <p class="q">Should I ask?</p>
+          <p>Asking an LLM advisor raised diamond success by 11 points. Where its recipes were wrong, asking made the agent worse.</p>
+          <a href="#ponder">More on PONDER</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="wrap">
+      <h2>Current projects</h2>
+      <p class="lede">Each one is built to answer a single question, with the comparisons fixed before the results come in.</p>
+      <div class="rows">
+
+        <article class="project" id="compass" style="--band: var(--z3)">
+          <div class="meta">
+            <strong>2026 – present</strong>
+            Memory
+            <span class="status">Under review</span>
+          </div>
+          <div>
+            <h3>COMPASS</h3>
+            <p class="sub">Grid or nodes? How a world model should remember objects it can't see</p>
+            <p>A robot that turns away from a moving cart still needs to know where the cart went. FloWM, a recent world model from ICML 2026, keeps hidden objects in a dense top-down feature grid that it shifts with five built-in velocities. I reproduced FloWM to its published error and compared it with a node memory that stores each object's position and velocity explicitly, as a Kalman-filtered belief.</p>
+            <p>The comparison also showed how much a memory score depends on the probe that reads it: a single-cell probe finds 66% of out-of-view blocks where a rebuild of FloWM's own probe finds 89%. Both memories generalize only as far as their motion prior reaches, but a node memory's prior can be refit without labels. I'm now building a learned node memory whose cost grows with the number of objects, not the size of the room.</p>
+            <div class="results">
+              <div class="result"><b>94% vs 4%</b><span>of hidden blocks found on motion outside FloWM's built-in velocities, in a pre-registered, independently verified test on 1,024 held-out videos. The node memory gets oracle detections; FloWM works from pixels.</span></div>
+              <div class="result"><b>14 KB</b><span>of memory state for the node memory, against 5.6 MB for FloWM's grid.</span></div>
+            </div>
+            <p class="plinks"><span class="note">Workshop paper “Grid or Nodes?” at CoRL 2026, Do Robots Need World Models? Preprint coming soon.</span></p>
+          </div>
+          <figure class="chart" aria-labelledby="chart-title">
+            <figcaption class="chart-title" id="chart-title">Hidden blocks found when they move outside FloWM's built-in velocities</figcaption>
+            <ul class="bars">
+              <li class="bar-row" tabindex="0" style="--v: 93.9">
+                <span class="bar-label">Node memory, oracle detections</span>
+                <span class="track"><span class="fill hl"></span><span class="val">93.9%</span></span>
+                <span class="tip" role="tooltip">Pre-registered run, scored on exactly the same answers as the released FloWM. Paired difference 89.8 points (95% CI 89.1 to 90.5).</span>
+              </li>
+              <li class="bar-row" tabindex="0" style="--v: 4.1">
+                <span class="bar-label">FloWM, released model</span>
+                <span class="track"><span class="fill"></span><span class="val">4.1%</span></span>
+                <span class="tip" role="tooltip">Read by a rebuild of FloWM's convolutional probe, trained on standard motion.</span>
+              </li>
+              <li class="bar-row" tabindex="0" style="--v: 12.6">
+                <span class="bar-label">FloWM, fine-tuned on these motions</span>
+                <span class="track"><span class="fill"></span><span class="val">12.6%</span></span>
+                <span class="tip" role="tooltip">20k steps of fine-tuning. Pooled from logged per-motion accuracies, so no interval.</span>
+              </li>
+              <li class="bar-row" tabindex="0" style="--v: 9.1">
+                <span class="bar-label">FloWM, retrained from scratch</span>
+                <span class="track"><span class="fill"></span><span class="val">9.1%</span></span>
+                <span class="tip" role="tooltip">150k steps with FloWM's recipe. Pooled from logged per-motion accuracies, so no interval.</span>
+              </li>
+            </ul>
+            <p class="chart-note">Out-of-view accuracy on diagonal and speed-2 blocks, 1,024 held-out videos. Hover or focus a bar for details.</p>
+          </figure>
+        </article>
+
+        <article class="project" id="sp-jepa" style="--band: var(--z2)">
+          <div class="meta">
+            <strong>2026 – present</strong>
+            Perception
+            <span class="status">In preparation</span>
+          </div>
+          <div>
+            <h3>SP-JEPA</h3>
+            <p class="sub">Do superpixel tokens change what a JEPA learns? A controlled study</p>
+            <p>Vision transformers cut images into a fixed grid that ignores object boundaries. Superpixels follow edges, so they looked like a natural fit for object-centric encoders and world models. I built SP-JEPA, an I-JEPA-style encoder that reads SLIC superpixel tokens, and a grid twin that differs only in the partition, then trained an 18-run matrix from ViT-Tiny to ViT-Base and from ImageNet-100 to ImageNet-1K.</p>
+            <p>I started out expecting superpixels to win. Matched controls turned the project into a sharper question, and the answer so far is no: the two encoders tie, grid features read out on superpixels do just as well as superpixel features, and superpixel shape handed to the predictor becomes a shortcut rather than a feature.</p>
+            <div class="results">
+              <div class="result"><b>Tie</b><span>between superpixel and grid encoders on VOC segmentation. Neither leads by the pre-registered bound, over 3 training seeds and 5 probe seeds each.</span></div>
+              <div class="result"><b>−3.4 to −5.0</b><span>ImageNet-100 points lost when region shape is written into the tokens.</span></div>
+            </div>
+          </div>
+          <figure class="fig">
+            <div class="figure"><canvas id="partition" role="img" aria-label="A rendered scene of coloured blocks, a sphere and a cylinder, overlaid with either a regular grid of square tokens or superpixel tokens that follow the object edges. One token is highlighted."></canvas></div>
+            <figcaption>
+              <div class="seg" role="group" aria-label="Token partition">
+                <button type="button" data-partition="grid" aria-pressed="false">Grid</button>
+                <button type="button" data-partition="slic" aria-pressed="true">Superpixels</button>
+              </div>
+              <p>Hover the image to see one token. The grid cuts across edges and superpixels follow them, yet under matched training the encoder learns about as well from either.</p>
+            </figcaption>
+          </figure>
+        </article>
+
+        <article class="project" id="ponder" style="--band: var(--z4)">
+          <div class="meta">
+            <strong>2026 – present</strong>
+            Metacognition
+            <span class="status">Active</span>
+          </div>
+          <div>
+            <h3>PONDER</h3>
+            <p class="sub">When should an agent ask an LLM, and what should it ask?</p>
+            <p>A language model knows a lot about worlds in general and nothing about this one in particular. PONDER puts an agent with a planner and a map memory into Craftax, a fast Minecraft-like game, and lets it pay to ask a frozen LLM what to do next, how to get an item, where something is, or why an action failed. The world decides whether the advice was right. To test advice that is confidently wrong, I built counterfactual worlds with altered crafting rules.</p>
+            <p>A power analysis on about 179,000 real decision states showed, before any cluster compute was spent, that a learned policy could not yet tell a useful question from noise. The project is now a controlled study of when asking pays.</p>
+            <div class="results">
+              <div class="result"><b>+11 points</b><span>of diamond success when the agent asks at planning events, in a pre-registered recheck over 200 paired episodes (one-sided p = 0.004).</span></div>
+              <div class="result"><b>59%</b><span>of the advisor's recipe answers were contradicted by counterfactual worlds on the iron-pickaxe task, where asking made the agent worse.</span></div>
+            </div>
+          </div>
+          <figure class="fig">
+            <div class="figure">
+              <svg viewBox="0 0 360 270" role="img" aria-labelledby="ponder-t ponder-d">
+                <title id="ponder-t">How PONDER is set up</title>
+                <desc id="ponder-d">The agent has a planner, a map memory and an asking policy. It can pay a cost to send a question to a frozen LLM advisor that knows the usual crafting rules, and gets advice back. It acts in the world, which shows whether the advice was right.</desc>
+                <defs>
+                  <marker id="arr-m" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker>
+                  <marker id="arr-o" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="var(--z4)"/></marker>
+                </defs>
+                <rect class="dg-box" x="12" y="18" width="124" height="124" rx="8"/>
+                <text class="dg-h" x="24" y="42">Agent</text>
+                <text class="dg-t" x="24" y="66">planner</text>
+                <text class="dg-t" x="24" y="86">map memory</text>
+                <rect x="20" y="100" width="108" height="30" rx="6" fill="color-mix(in srgb, var(--z4) 16%, transparent)" stroke="var(--z4)"/>
+                <text class="dg-h" x="30" y="120">asking policy</text>
+
+                <rect class="dg-box" x="224" y="18" width="124" height="124" rx="8"/>
+                <text class="dg-h" x="236" y="42">LLM advisor</text>
+                <text class="dg-t" x="236" y="66">frozen</text>
+                <text class="dg-t" x="236" y="86">knows the usual</text>
+                <text class="dg-t" x="236" y="104">crafting rules</text>
+
+                <path class="dg-ask" d="M136 58 H220" marker-end="url(#arr-o)"/>
+                <text class="dg-o" x="180" y="50" text-anchor="middle">question</text>
+                <text class="dg-o" x="180" y="77" text-anchor="middle">costs reward</text>
+                <path class="dg-line" d="M224 116 H140" marker-end="url(#arr-m)"/>
+                <text class="dg-t" x="180" y="108" text-anchor="middle">advice</text>
+
+                <path class="dg-line" d="M52 142 V186" marker-end="url(#arr-m)"/>
+                <text class="dg-t" x="60" y="170">act</text>
+                <path class="dg-line" d="M100 190 V146" marker-end="url(#arr-m)"/>
+                <text class="dg-t" x="108" y="170">observe</text>
+
+                <rect class="dg-box" x="12" y="190" width="336" height="64" rx="8"/>
+                <text class="dg-h" x="24" y="214">World: Craftax, some with altered recipes</text>
+                <text class="dg-t" x="24" y="237">Advice gets tried here. A wrong recipe fails.</text>
+              </svg>
+            </div>
+            <figcaption><p>Everything except the asking policy is scripted or an oracle, so the only thing being learned is when, and what, to ask.</p></figcaption>
+          </figure>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="more">
+    <div class="wrap">
+      <h2>3D perception and earlier work</h2>
+      <p class="lede">Before world models, I worked on drone lidar, multimodal fusion, synthetic data and RF sensing. The lidar work is still going.</p>
+      <div class="rows">
+        <article class="project" id="permafrost" style="--band: var(--z1)">
+          <div class="meta">
+            <strong>2025 – present</strong>
+            Drone lidar, interior Alaska
+            <span class="status">In preparation</span>
+          </div>
+          <div>
+            <h3>Preserving vertical structure for permafrost thaw mapping</h3>
+            <p class="sub">3D-to-2D projection with learned height embeddings</p>
+            <p>Most point-cloud-to-raster pipelines flatten away the vertical structure of a forest, which is exactly the signal that relates to what is happening in the ground below. This model pairs a Point Transformer V3 encoder with a projection decoder that uses learned height embeddings and z-stratified sampling to keep that structure, and predicts thaw and heave maps from drone lidar.</p>
+            <p>I compared it with PointPillars- and BEVFusion-style projections on a shared encoder, using data collected with collaborators at a US Army Corps of Engineers field site near Fairbanks. A journal version for IEEE Transactions on Geoscience and Remote Sensing is in preparation.</p>
+          </div>
+          <figure class="fig">
+            <div class="figure"><canvas id="cloud" tabindex="0" role="img" aria-label="A synthetic forest point cloud with a thermokarst pond, coloured by height band. Drag, or use the left and right arrow keys, to rotate it."></canvas></div>
+            <figcaption><p>A synthetic forest plot, coloured by height band. Drag or use the arrow keys to rotate it.</p></figcaption>
+          </figure>
+        </article>
+      </div>
+
+      <div class="earlier">
+        <article>
+          <h3>SegGen</h3>
+          <p class="venue">MDPI Sensors, 2025</p>
+          <p>An Unreal Engine 5 pipeline that generates pixel-accurate RGB, depth and semantic labels in procedurally generated forests, collected by an autonomous drone inside the engine. Released as an open-source tool and dataset.</p>
+          <div class="plinks"><a href="https://doi.org/10.3390/s25175569">Paper</a></div>
+        </article>
+        <article>
+          <h3>FuseForm</h3>
+          <p class="venue">GeoCV workshop at WACV, 2025</p>
+          <p>A local-global fusion transformer for multimodal semantic segmentation. It outperformed state-of-the-art models across five datasets by 2 to 15%.</p>
+          <div class="plinks"><a href="https://openaccess.thecvf.com/content/WACV2025W/GeoCV/html/McMillen_FuseForm_Multimodal_Transformer_for_Semantic_Segmentation_WACVW_2025_paper.html">Paper</a></div>
+        </article>
+        <article>
+          <h3>RF fingerprint authentication</h3>
+          <p class="venue">IEEE Access, 2025, and IEEE WAMICON 2023</p>
+          <p>Deep learning on raw I/Q samples from 3D-printed chaotic antenna arrays, reaching 100% device classification across up to 300 users.</p>
+          <div class="plinks"><a href="https://doi.org/10.1109/ACCESS.2025.3526583">Journal paper</a><a href="https://arxiv.org/abs/2303.07466">Conference paper</a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="wrap">
+      <h2>Experience</h2>
+      <p class="lede">Research in academia and industry, with an earlier stint helping run a power grid.</p>
+      <ul class="timeline">
+        <li>
+          <div class="when">May 2025 – present</div>
+          <div>
+            <h3>PhD Research Intern, Advanced Analytics R&amp;D</h3>
+            <p class="org">SAS Institute, remote</p>
+            <p>JEPA-style self-supervised pretraining on vibration spectrograms, with per-deployment LoRA adaptation, for predictive maintenance of rotating machinery. I also designed and ran an evaluation of 56 hyperspectral image-processing algorithms across 7 datasets.</p>
+          </div>
+        </li>
+        <li>
+          <div class="when">Aug 2022 – present</div>
+          <div>
+            <h3>Graduate Research Assistant and Lab Manager</h3>
+            <p class="org">SISLab, University of South Florida</p>
+            <p>Mentored two PhD students and an undergraduate on NSF, Army Corps of Engineers and DoD projects. I run the lab's compute: 10 workstations and two GPU nodes, one with 2 A100s and one with 6 H100s.</p>
+          </div>
+        </li>
+        <li>
+          <div class="when">July 2026</div>
+          <div>
+            <h3>Visiting Researcher</h3>
+            <p class="org">Machine Intelligence Lab, University of Tokyo (Prof. Tatsuya Harada)</p>
+            <p>Gave a formal seminar on SP-JEPA to Prof. Harada's group, followed by a technical discussion of tokenizer design and positional embeddings for object-centric world models.</p>
+          </div>
+        </li>
+        <li>
+          <div class="when">Jan 2020 – May 2022</div>
+          <div>
+            <h3>Distribution Control Room Engineer (Intern)</h3>
+            <p class="org">Tampa Electric</p>
+            <p>Built a genetic algorithm for systemwide phase balancing that saves $2M and 1,000 tons of CO₂ a year.</p>
+          </div>
+        </li>
+      </ul>
+      <div class="honors">
+        <span>NSF NRT Fellow</span>
+        <span>Sigma Xi, full member</span>
+        <span>Fluent in Japanese (JLPT N1)</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="publications">
+    <div class="wrap">
+      <h2>Publications</h2>
+      <p class="lede">Full list. Also on <a href="https://scholar.google.com/citations?user=tedFHyYAAAAJ&amp;hl=en">Google Scholar</a>.</p>
+      <ul class="pubs">
+        <li>
+          <div class="venue">Under review<br>CoRL 2026 workshop</div>
+          <div>
+            <span class="title">Grid or Nodes? Probing Object Memory in World Models Under Partial Observability</span>
+            <span class="authors"><b>J. McMillen</b>, Y. Yilmaz. Workshop: Do Robots Need World Models?</span>
+          </div>
+        </li>
+        <li>
+          <div class="venue">In preparation</div>
+          <div>
+            <span class="title">Do Superpixel Tokens Change What a JEPA Learns? A Controlled Study</span>
+            <span class="authors"><b>J. McMillen</b>, Y. Yilmaz</span>
+          </div>
+        </li>
+        <li>
+          <div class="venue">In preparation<br>IEEE TGRS</div>
+          <div>
+            <span class="title">Preserving Vertical Structure in 3D-to-2D Projection for Permafrost Thaw Mapping</span>
+            <span class="authors"><b>J. McMillen</b>, R. Van Alphen, T. Sadeghi Chorsi, J. Shabaga, M. Rodgers, R. Malservisi, T. Dixon, Y. Yilmaz</span>
+          </div>
+        </li>
+        <li>
+          <div class="venue">MDPI Sensors 2025</div>
+          <div>
+            <span class="title">SegGen: An Unreal Engine 5 Pipeline for Generating Multimodal Semantic Segmentation Datasets</span>
+            <span class="authors"><b>J. McMillen</b>, Y. Yilmaz. Sensors 25(17), 5569</span>
+            <div class="plinks"><a href="https://doi.org/10.3390/s25175569">Paper</a></div>
+          </div>
+        </li>
+        <li>
+          <div class="venue">IEEE Access 2025</div>
+          <div>
+            <span class="title">Hardware and Deep Learning-Based Authentication Through Enhanced RF Fingerprints of 3D-Printed Chaotic Antenna Arrays</span>
+            <span class="authors"><b>J. McMillen</b>, F. Razak, G. Mumcu, Y. Yilmaz. IEEE Access 13, 6893–6908</span>
+            <div class="plinks"><a href="https://doi.org/10.1109/ACCESS.2025.3526583">Paper</a></div>
+          </div>
+        </li>
+        <li>
+          <div class="venue">GeoCV workshop<br>WACV 2025</div>
+          <div>
+            <span class="title">FuseForm: Multimodal Transformer for Semantic Segmentation</span>
+            <span class="authors"><b>J. McMillen</b>, Y. Yilmaz</span>
+            <div class="plinks"><a href="https://openaccess.thecvf.com/content/WACV2025W/GeoCV/html/McMillen_FuseForm_Multimodal_Transformer_for_Semantic_Segmentation_WACVW_2025_paper.html">Paper</a></div>
+          </div>
+        </li>
+        <li>
+          <div class="venue">IEEE WAMICON 2023<br>Invited paper</div>
+          <div>
+            <span class="title">Deep Learning-based RF Fingerprint Authentication with Chaotic Antenna Arrays</span>
+            <span class="authors"><b>J. McMillen</b>, Y. Yilmaz</span>
+            <div class="plinks"><a href="https://arxiv.org/abs/2303.07466">Paper</a></div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2>Get in touch</h2>
+    <p>I'm looking for research scientist roles in world models and embodied AI, starting summer 2027, and I'm always glad to talk about object memory, JEPAs, or agents that know when to ask. <span lang="ja">日本語でもお気軽にどうぞ。</span></p>
+    <div class="links">
+      <a class="btn primary" href="mailto:jomcmillen@gmail.com">jomcmillen@gmail.com</a>
+      <a class="btn" href="cv.pdf">CV</a>
+      <a class="btn" href="https://github.com/" data-github>GitHub</a>
+      <a class="btn" href="https://scholar.google.com/citations?user=tedFHyYAAAAJ&amp;hl=en">Google Scholar</a>
+      <a class="btn" href="https://www.linkedin.com/in/justin-mcmillen/">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* GitHub links: set your username here, or leave it empty to read it from a username.github.io address. */
+(() => {
+  const GITHUB_USER = "";
+  const host = location.hostname;
+  const user = GITHUB_USER || (host.endsWith(".github.io") ? host.split(".")[0] : "");
+  document.querySelectorAll("[data-github]").forEach(a => {
+    if (user) a.href = "https://github.com/" + user;
+    else a.hidden = true;
+  });
+})();
+
+const css = getComputedStyle(document.documentElement);
+const tok = name => css.getPropertyValue(name).trim();
+const rgba = (hex, a) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+};
+const BANDS = ["--z0", "--z1", "--z2", "--z3", "--z4"].map(tok);
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Hero: a toy node memory. Each block gets one node, a constant-velocity Kalman
+   filter per axis that is updated while the block is in view and only predicted
+   while it is out of view. Walls reflect both the blocks and the nodes. */
+(() => {
+  const canvas = document.getElementById("memory");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const TEXT = tok("--text"), MUTED = tok("--muted"), LINE = tok("--line"), SURFACE = tok("--surface");
+
+  const N = 16, HALF = 0.35, LO = HALF, HI = N - HALF;
+  const FOV = Math.PI / 3, DT = 1 / 60;
+  const RN = 0.02;   // measurement noise variance, cells^2
+  const QN = 0.008;  // process noise
+
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const gauss = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+
+  const blocks = [
+    [3.0, 4.0, 1.6, 0.0],
+    [12.5, 3.0, 0.0, 1.3],
+    [5.0, 12.0, 1.1, 1.1],
+    [11.0, 10.5, -1.3, 0.8],
+    [8.0, 6.0, 2.3, -0.7],
+  ].map(([x, y, vx, vy], i) => ({ x, y, vx, vy, color: i === 0 ? "#5A9CC0" : BANDS[i], node: null, inView: false, hidden: 0, pulse: -1 }));
+
+  const agent = { x: 8, y: 8, h: 0 };
+  let t = 0;
+
+  const filter = z => ({ p: z, v: 0, a: RN, b: 0, c: 4 });
+  function predict(k) {
+    k.p += k.v * DT;
+    const a = k.a + 2 * DT * k.b + DT * DT * k.c + QN * DT * DT * DT / 3;
+    const b = k.b + DT * k.c + QN * DT * DT / 2;
+    k.c += QN * DT; k.a = a; k.b = b;
+    if (k.p < LO) { k.p = 2 * LO - k.p; k.v = -k.v; }
+    else if (k.p > HI) { k.p = 2 * HI - k.p; k.v = -k.v; }
+  }
+  function correct(k, z) {
+    const s = k.a + RN, k0 = k.a / s, k1 = k.b / s, y = z - k.p;
+    k.p += k0 * y; k.v += k1 * y;
+    const c = k.c - k1 * k.b;
+    k.a *= 1 - k0; k.b *= 1 - k0; k.c = c;
+  }
+
+  function step() {
+    t += DT;
+    agent.x = 8 + 3.4 * Math.sin(0.13 * t);
+    agent.y = 8 + 2.8 * Math.sin(0.19 * t + 1.2);
+    agent.h = 0.5 * t;
+    for (const b of blocks) {
+      b.x += b.vx * DT; b.y += b.vy * DT;
+      if (b.x < LO) { b.x = 2 * LO - b.x; b.vx = -b.vx; } else if (b.x > HI) { b.x = 2 * HI - b.x; b.vx = -b.vx; }
+      if (b.y < LO) { b.y = 2 * LO - b.y; b.vy = -b.vy; } else if (b.y > HI) { b.y = 2 * HI - b.y; b.vy = -b.vy; }
+      if (b.node) { predict(b.node.x); predict(b.node.y); }
+      const dx = b.x - agent.x, dy = b.y - agent.y, ang = Math.atan2(dy, dx) - agent.h;
+      const seen = Math.abs(Math.atan2(Math.sin(ang), Math.cos(ang))) < FOV / 2 && dx * dx + dy * dy > 0.3;
+      if (seen) {
+        const zx = b.x + gauss() * Math.sqrt(RN), zy = b.y + gauss() * Math.sqrt(RN);
+        if (!b.node) b.node = { x: filter(zx), y: filter(zy) };
+        else {
+          if (!b.inView && b.hidden > 0.8) b.pulse = t;
+          correct(b.node.x, zx); correct(b.node.y, zy);
+        }
+        b.hidden = 0;
+      } else b.hidden += DT;
+      b.inView = seen;
+    }
+  }
+
+  let W = 0, H = 0, S = 0, ox = 0, oy = 0, u = 0, showTruth = true;
+  const X = x => ox + x * u, Y = y => oy + y * u;
+  const square = (cx, cy, h) => {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(cx - h, cy - h, 2 * h, 2 * h, 2); else ctx.rect(cx - h, cy - h, 2 * h, 2 * h);
+  };
+
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = SURFACE;
+    ctx.fillRect(ox, oy, S, S);
+
+    ctx.beginPath();
+    for (let i = 1; i < N; i++) {
+      const gx = Math.round(X(i)) + 0.5, gy = Math.round(Y(i)) + 0.5;
+      ctx.moveTo(gx, oy); ctx.lineTo(gx, oy + S);
+      ctx.moveTo(ox, gy); ctx.lineTo(ox + S, gy);
+    }
+    ctx.strokeStyle = LINE; ctx.lineWidth = 1; ctx.stroke();
+
+    const ax = X(agent.x), ay = Y(agent.y);
+    ctx.save();
+    ctx.beginPath(); ctx.rect(ox, oy, S, S); ctx.clip();
+    const g = ctx.createRadialGradient(ax, ay, 0, ax, ay, S);
+    g.addColorStop(0, rgba(TEXT, 0.2)); g.addColorStop(1, rgba(TEXT, 0.03));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.moveTo(ax, ay);
+    ctx.arc(ax, ay, S * 1.5, agent.h - FOV / 2, agent.h + FOV / 2);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+
+    ctx.strokeStyle = rgba(MUTED, 0.7); ctx.lineWidth = 1.5;
+    ctx.strokeRect(ox + 0.75, oy + 0.75, S - 1.5, S - 1.5);
+
+    const hs = HALF * u;
+    for (const b of blocks) {
+      if (b.inView) continue;
+      if (showTruth) {
+        ctx.setLineDash([3, 3]); ctx.strokeStyle = rgba(b.color, 0.6); ctx.lineWidth = 1;
+        ctx.strokeRect(X(b.x) - hs, Y(b.y) - hs, 2 * hs, 2 * hs);
+        ctx.setLineDash([]);
+      }
+      if (!b.node) continue;
+      const nx = X(b.node.x.p), ny = Y(b.node.y.p);
+      const rx = Math.max(hs, Math.min(2 * Math.sqrt(b.node.x.a) * u, 3 * u));
+      const ry = Math.max(hs, Math.min(2 * Math.sqrt(b.node.y.a) * u, 3 * u));
+      ctx.beginPath(); ctx.ellipse(nx, ny, rx, ry, 0, 0, 2 * Math.PI);
+      ctx.fillStyle = rgba(b.color, 0.14); ctx.fill();
+      ctx.strokeStyle = rgba(b.color, 0.45); ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(nx, ny, hs * 1.05, 0, 2 * Math.PI);
+      ctx.strokeStyle = b.color; ctx.lineWidth = 2; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(nx, ny);
+      ctx.lineTo(nx + b.node.x.v * 0.45 * u, ny + b.node.y.v * 0.45 * u);
+      ctx.lineWidth = 1.5; ctx.stroke();
+    }
+    for (const b of blocks) {
+      if (!b.inView) continue;
+      ctx.fillStyle = b.color;
+      square(X(b.x), Y(b.y), hs); ctx.fill();
+    }
+    for (const b of blocks) {
+      if (b.pulse < 0) continue;
+      const age = t - b.pulse;
+      if (age > 0.7 || age < 0) { b.pulse = -1; continue; }
+      const k = age / 0.7;
+      ctx.beginPath(); ctx.arc(X(b.x), Y(b.y), hs * (1.3 + 2 * k), 0, 2 * Math.PI);
+      ctx.strokeStyle = rgba(b.color, 0.8 * (1 - k)); ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    ctx.save(); ctx.translate(ax, ay); ctx.rotate(agent.h);
+    ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, 6); ctx.lineTo(-2.5, 0); ctx.lineTo(-6, -6); ctx.closePath();
+    ctx.fillStyle = TEXT; ctx.fill();
+    ctx.restore();
+  }
+
+  function resize() {
+    const r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width = Math.max(1, Math.round(W * dpr)); canvas.height = Math.max(1, Math.round(H * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    S = Math.floor(Math.min(W, H)) - 2; u = S / N;
+    ox = Math.round((W - S) / 2); oy = Math.round((H - S) / 2);
+    draw();
+  }
+
+  let running = !reduceMotion, onScreen = true, raf = 0, last = 0, acc = 0;
+  function frame(now) {
+    raf = 0;
+    if (last) {
+      acc = Math.min(acc + (now - last) / 1000, 0.2);
+      while (acc >= DT) { step(); acc -= DT; }
+    }
+    last = now;
+    draw();
+    go();
+  }
+  function go() { if (running && onScreen && !document.hidden && !raf) raf = requestAnimationFrame(frame); }
+  function halt() { if (raf) cancelAnimationFrame(raf); raf = 0; last = 0; }
+
+  const pauseBtn = document.getElementById("demo-pause");
+  const truthBtn = document.getElementById("demo-truth");
+  const label = () => { pauseBtn.textContent = running ? "Pause" : "Play"; };
+  pauseBtn.addEventListener("click", () => { running = !running; label(); running ? go() : halt(); });
+  truthBtn.addEventListener("click", () => {
+    showTruth = !showTruth;
+    truthBtn.textContent = showTruth ? "Hide true positions" : "Show true positions";
+    draw();
+  });
+
+  for (let i = 0; i < 60 * 9; i++) step();   // start with a few blocks already out of view
+  label();
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; onScreen ? go() : halt(); }).observe(canvas);
+  document.addEventListener("visibilitychange", () => (document.hidden ? halt() : go()));
+  go();
+})();
+
+/* SP-JEPA: the same rendered scene cut into a 16 x 12 grid or into SLIC superpixels
+   (computed here, on a 160 x 120 copy of the scene). Hover shows one token. */
+(() => {
+  const canvas = document.getElementById("partition");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const [Z0, Z1, Z2, Z3, Z4] = BANDS;
+  const LW = 160, LH = 120, GX = 16, CELL = 10, NP = LW * LH;
+
+  const shade = (hex, f) => {
+    const n = parseInt(hex.slice(1), 16), target = f > 0 ? 255 : 0, k = Math.abs(f);
+    const c = v => Math.round(v + (target - v) * k);
+    return `rgb(${c((n >> 16) & 255)},${c((n >> 8) & 255)},${c(n & 255)})`;
+  };
+  function cube(g, x, y, w, h, d, col) {
+    const dy = d * 0.6;
+    g.fillStyle = shade(col, -0.1); g.fillRect(x, y, w, h);
+    g.fillStyle = shade(col, 0.25);
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + d, y - dy); g.lineTo(x + w + d, y - dy); g.lineTo(x + w, y); g.closePath(); g.fill();
+    g.fillStyle = shade(col, -0.4);
+    g.beginPath(); g.moveTo(x + w, y); g.lineTo(x + w + d, y - dy); g.lineTo(x + w + d, y + h - dy); g.lineTo(x + w, y + h); g.closePath(); g.fill();
+  }
+  function paint(g, w, h) {
+    g.save(); g.scale(w / LW, h / LH);
+    let gr = g.createLinearGradient(0, 0, 0, 74);
+    gr.addColorStop(0, "#1B2E3D"); gr.addColorStop(1, "#2A4354");
+    g.fillStyle = gr; g.fillRect(0, 0, LW, 74);
+    gr = g.createLinearGradient(0, 74, 0, LH);
+    gr.addColorStop(0, "#3A5164"); gr.addColorStop(1, "#1A2934");
+    g.fillStyle = gr; g.fillRect(0, 74, LW, LH - 74);
+    g.fillStyle = "rgba(6,12,18,0.5)";
+    for (const [x, y, rx, ry] of [[44, 97, 26, 5], [86, 101, 16, 4], [124, 93, 16, 3.5], [148, 100, 12, 3], [72, 107, 11, 2.5]]) {
+      g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, 2 * Math.PI); g.fill();
+    }
+    cube(g, 106, 42, 18, 50, 8, Z0);
+    cube(g, 22, 64, 36, 32, 12, Z4);
+    gr = g.createLinearGradient(136, 0, 156, 0);
+    gr.addColorStop(0, shade(Z3, -0.25)); gr.addColorStop(0.45, shade(Z3, 0.05)); gr.addColorStop(1, shade(Z3, -0.35));
+    g.fillStyle = gr; g.fillRect(136, 74, 20, 24);
+    g.beginPath(); g.ellipse(146, 98, 10, 3, 0, 0, Math.PI); g.fill();
+    g.fillStyle = shade(Z3, 0.3);
+    g.beginPath(); g.ellipse(146, 74, 10, 3, 0, 0, 2 * Math.PI); g.fill();
+    gr = g.createRadialGradient(81, 81, 1.5, 86, 87, 15);
+    gr.addColorStop(0, shade(Z1, 0.4)); gr.addColorStop(0.55, Z1); gr.addColorStop(1, shade(Z1, -0.4));
+    g.fillStyle = gr; g.beginPath(); g.arc(86, 87, 14, 0, 2 * Math.PI); g.fill();
+    cube(g, 62, 96, 14, 11, 6, Z2);
+    g.restore();
+  }
+
+  const off = document.createElement("canvas"); off.width = LW; off.height = LH;
+  const og = off.getContext("2d", { willReadFrequently: true });
+  paint(og, LW, LH);
+  const px = og.getImageData(0, 0, LW, LH).data;
+  const R = new Float32Array(NP), G = new Float32Array(NP), B = new Float32Array(NP);
+  for (let i = 0; i < NP; i++) { R[i] = px[4 * i]; G[i] = px[4 * i + 1]; B[i] = px[4 * i + 2]; }
+
+  const grid = new Int32Array(NP);
+  for (let y = 0; y < LH; y++) for (let x = 0; x < LW; x++) grid[y * LW + x] = Math.floor(x / CELL) + Math.floor(y / CELL) * GX;
+
+  const slic = (() => {
+    const S = CELL, m = 24, w = (m / S) ** 2, K = GX * (LH / CELL);
+    const cx = new Float32Array(K), cy = new Float32Array(K), cr = new Float32Array(K), cg = new Float32Array(K), cb = new Float32Array(K);
+    for (let k = 0; k < K; k++) {
+      const x = Math.round(S / 2 + (k % GX) * S), y = Math.round(S / 2 + Math.floor(k / GX) * S), p = y * LW + x;
+      cx[k] = x; cy[k] = y; cr[k] = R[p]; cg[k] = G[p]; cb[k] = B[p];
+    }
+    const lab = new Int32Array(NP), dist = new Float32Array(NP);
+    for (let it = 0; it < 10; it++) {
+      dist.fill(Infinity);
+      for (let k = 0; k < K; k++) {
+        const x0 = Math.max(0, Math.floor(cx[k] - 2 * S)), x1 = Math.min(LW - 1, Math.ceil(cx[k] + 2 * S));
+        const y0 = Math.max(0, Math.floor(cy[k] - 2 * S)), y1 = Math.min(LH - 1, Math.ceil(cy[k] + 2 * S));
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+          const p = y * LW + x, dr = R[p] - cr[k], dg = G[p] - cg[k], db = B[p] - cb[k], dx = x - cx[k], dy = y - cy[k];
+          const D = dr * dr + dg * dg + db * db + w * (dx * dx + dy * dy);
+          if (D < dist[p]) { dist[p] = D; lab[p] = k; }
+        }
+      }
+      const sx = new Float32Array(K), sy = new Float32Array(K), sr = new Float32Array(K), sg = new Float32Array(K), sb = new Float32Array(K), cnt = new Float32Array(K);
+      for (let p = 0; p < NP; p++) {
+        const k = lab[p];
+        sx[k] += p % LW; sy[k] += (p / LW) | 0; sr[k] += R[p]; sg[k] += G[p]; sb[k] += B[p]; cnt[k]++;
+      }
+      for (let k = 0; k < K; k++) if (cnt[k]) {
+        cx[k] = sx[k] / cnt[k]; cy[k] = sy[k] / cnt[k]; cr[k] = sr[k] / cnt[k]; cg[k] = sg[k] / cnt[k]; cb[k] = sb[k] / cnt[k];
+      }
+    }
+    // enforce connectivity: fold small fragments into a neighbouring region
+    const out = new Int32Array(NP).fill(-1), queue = new Int32Array(NP), minSize = (S * S) >> 2;
+    let next = 0;
+    for (let p0 = 0; p0 < NP; p0++) {
+      if (out[p0] >= 0) continue;
+      const x0 = p0 % LW, y0 = (p0 / LW) | 0;
+      let adj = -1;
+      if (x0 > 0) adj = out[p0 - 1]; else if (y0 > 0) adj = out[p0 - LW];
+      let head = 0, tail = 0;
+      queue[tail++] = p0; out[p0] = next;
+      while (head < tail) {
+        const p = queue[head++], x = p % LW, y = (p / LW) | 0;
+        const nb = [x > 0 ? p - 1 : -1, x < LW - 1 ? p + 1 : -1, y > 0 ? p - LW : -1, y < LH - 1 ? p + LW : -1];
+        for (const q of nb) if (q >= 0 && out[q] < 0 && lab[q] === lab[p0]) { out[q] = next; queue[tail++] = q; }
+      }
+      if (tail < minSize && adj >= 0) { for (let i = 0; i < tail; i++) out[queue[i]] = adj; }
+      else next++;
+    }
+    return out;
+  })();
+
+  let W = 0, H = 0, mode = "slic", hover = -1, paths = null, hoverPath = new Path2D();
+  const labels = () => (mode === "slic" ? slic : grid);
+  const restLabel = () => labels()[84 * LW + 84];   // a token on the sphere
+
+  function outline(lab) {
+    const p = new Path2D(), sx = W / LW, sy = H / LH;
+    for (let y = 0; y < LH; y++) for (let x = 0; x < LW; x++) {
+      const i = y * LW + x;
+      if (x < LW - 1 && lab[i] !== lab[i + 1]) { p.moveTo((x + 1) * sx, y * sy); p.lineTo((x + 1) * sx, (y + 1) * sy); }
+      if (y < LH - 1 && lab[i] !== lab[i + LW]) { p.moveTo(x * sx, (y + 1) * sy); p.lineTo((x + 1) * sx, (y + 1) * sy); }
+    }
+    return p;
+  }
+
+  const hl = document.createElement("canvas"); hl.width = LW; hl.height = LH;
+  const hg = hl.getContext("2d");
+  function paintHighlight() {
+    const im = hg.createImageData(LW, LH), lab = labels();
+    for (let i = 0; i < NP; i++) if (lab[i] === hover) {
+      im.data[4 * i] = 230; im.data[4 * i + 1] = 237; im.data[4 * i + 2] = 242; im.data[4 * i + 3] = 90;
+    }
+    hg.putImageData(im, 0, 0);
+    hoverPath = new Path2D();
+    const sx = W / LW, sy = H / LH;
+    for (let y = 0; y < LH; y++) for (let x = 0; x < LW; x++) {
+      const i = y * LW + x, a = lab[i] === hover;
+      if (x < LW - 1 && a !== (lab[i + 1] === hover)) { hoverPath.moveTo((x + 1) * sx, y * sy); hoverPath.lineTo((x + 1) * sx, (y + 1) * sy); }
+      if (y < LH - 1 && a !== (lab[i + LW] === hover)) { hoverPath.moveTo(x * sx, (y + 1) * sy); hoverPath.lineTo((x + 1) * sx, (y + 1) * sy); }
+    }
+  }
+
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    paint(ctx, W, H);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(hl, 0, 0, W, H);
+    ctx.strokeStyle = "rgba(230,237,242,0.45)"; ctx.lineWidth = 1;
+    ctx.stroke(paths[mode]);
+    ctx.strokeStyle = "#E6EDF2"; ctx.lineWidth = 2;
+    ctx.stroke(hoverPath);
+  }
+  function resize() {
+    const r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width = Math.max(1, Math.round(W * dpr)); canvas.height = Math.max(1, Math.round(H * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    paths = { slic: outline(slic), grid: outline(grid) };
+    paintHighlight();
+    draw();
+  }
+  function setHover(l) { if (l !== hover) { hover = l; paintHighlight(); draw(); } }
+  function pick(e) {
+    const r = canvas.getBoundingClientRect();
+    const x = Math.min(LW - 1, Math.max(0, Math.floor((e.clientX - r.left) / r.width * LW)));
+    const y = Math.min(LH - 1, Math.max(0, Math.floor((e.clientY - r.top) / r.height * LH)));
+    setHover(labels()[y * LW + x]);
+  }
+  canvas.addEventListener("pointermove", pick);
+  canvas.addEventListener("pointerdown", pick);
+  canvas.addEventListener("pointerleave", () => setHover(restLabel()));
+
+  const buttons = document.querySelectorAll("[data-partition]");
+  buttons.forEach(btn => btn.addEventListener("click", () => {
+    mode = btn.dataset.partition;
+    buttons.forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+    hover = -1; setHover(restLabel());
+  }));
+
+  hover = restLabel(); paintHighlight();
+  new ResizeObserver(resize).observe(canvas);
+})();
+
+/* Permafrost: a synthetic forest plot coloured by height band. Drag or use the arrow keys to rotate. */
+(() => {
+  const canvas = document.getElementById("cloud");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const ground = (x, y) =>
+    0.06 * Math.sin(2.1 * x + 0.4) * Math.cos(1.7 * y) +
+    0.03 * Math.sin(5.3 * x * y) -
+    0.10 * Math.exp(-((x - 0.35) ** 2 + (y + 0.3) ** 2) / 0.05); // thermokarst pond
+
+  const pts = [];
+  for (let i = 0; i < 2600; i++) {
+    const x = rnd() * 2 - 1, y = rnd() * 2 - 1;
+    pts.push([x, y, ground(x, y) + (rnd() - 0.5) * 0.01]);
+  }
+  for (let t = 0; t < 46; t++) {
+    const tx = rnd() * 1.8 - 0.9, ty = rnd() * 1.8 - 0.9;
+    if ((tx - 0.35) ** 2 + (ty + 0.3) ** 2 < 0.06) continue; // nothing grows in the pond
+    const h = 0.25 + rnd() * 0.45, base = ground(tx, ty);
+    for (let k = 0; k < 14; k++) pts.push([tx + (rnd() - .5) * .01, ty + (rnd() - .5) * .01, base + rnd() * h * 0.45]);
+    for (let k = 0; k < 70; k++) {
+      const u = rnd(), r = (1 - u) * h * 0.22 * Math.sqrt(rnd()), a = rnd() * 6.283;
+      pts.push([tx + r * Math.cos(a), ty + r * Math.sin(a), base + h * (0.35 + 0.65 * u)]);
+    }
+  }
+  let zmin = Infinity, zmax = -Infinity;
+  for (const p of pts) { zmin = Math.min(zmin, p[2]); zmax = Math.max(zmax, p[2]); }
+  const groups = [[], [], [], [], []];
+  for (const p of pts) groups[Math.min(4, Math.floor((p[2] - zmin) / (zmax - zmin) * 5))].push(p);
+
+  let W = 0, H = 0, angle = 0.6, dragging = false, lastX = 0;
+  const pitch = 0.55, cp = Math.cos(pitch), sp = Math.sin(pitch);
+
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    const S = Math.min(W * 0.44, H * 0.6), cx = W / 2, cy = H * 0.63, f = 3.2;
+    const ca = Math.cos(angle), sa = Math.sin(angle);
+    for (let b = 0; b < 5; b++) {
+      ctx.fillStyle = BANDS[b];
+      ctx.globalAlpha = 0.55 + b * 0.09;
+      for (const [x, y, z] of groups[b]) {
+        const xr = x * ca - y * sa, yr = x * sa + y * ca;
+        const depth = yr * cp - z * sp, up = yr * sp + z * cp;
+        const k = f / (f + depth), s = 1.5 * k;
+        ctx.fillRect(cx + xr * S * k - s / 2, cy - up * S * k - s / 2, s, s);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function resize() {
+    const r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width = Math.max(1, Math.round(W * dpr)); canvas.height = Math.max(1, Math.round(H * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  canvas.style.cursor = "grab";
+  canvas.style.touchAction = "pan-y";
+  canvas.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; canvas.setPointerCapture(e.pointerId); canvas.style.cursor = "grabbing"; });
+  canvas.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    angle += (e.clientX - lastX) * 0.008; lastX = e.clientX; draw();
+  });
+  const release = () => { dragging = false; canvas.style.cursor = "grab"; };
+  canvas.addEventListener("pointerup", release);
+  canvas.addEventListener("pointercancel", release);
+  canvas.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      angle += e.key === "ArrowLeft" ? -0.15 : 0.15; draw(); e.preventDefault();
+    }
+  });
+  new ResizeObserver(resize).observe(canvas);
+})();
+</script>
+</body>
+</html>
